@@ -1,6 +1,7 @@
 // src/pages/LoginPage.jsx
 import { useState } from "react";
 import axios from "axios";
+import "../styles/LoginPage.css";
 
 function LoginPage() {
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
@@ -9,14 +10,13 @@ function LoginPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError(""); // Clear previous errors
+    setError("");
 
     try {
-      const credentials = btoa(`${usernameOrEmail}:${password}`); // Encode credentials
-
+      const credentials = btoa(`${usernameOrEmail}:${password}`);
       const response = await axios.post(
-        import.meta.env.VITE_AUTH_API, // Use environment variable
-        {}, // Empty body
+        "https://learn.reboot01.com/api/auth/signin",
+        {},
         {
           headers: {
             Authorization: `Basic ${credentials}`,
@@ -24,52 +24,52 @@ function LoginPage() {
         }
       );
 
-      const token = response.data; // Directly assign the response as the token
-
-      // Validate token format (should have 3 parts separated by '.')
+      const token = response.data;
       if (!token || token.split(".").length !== 3) {
         throw new Error(`Invalid token format received.`);
       }
 
-      localStorage.setItem("token", token); // Save the token
-
-      window.location.href = "/profile"; // Redirect to profile page
+      localStorage.setItem("token", token);
+      window.location.href = "/profile";
     } catch (err) {
       let message = "An unexpected error occurred. Please try again.";
       if (err.response?.status === 401) {
         message = "Invalid credentials. Please try again.";
-      } else if (err.response?.data?.error) {
-        message = err.response.data.error; // Show specific error message from API
       }
-      setError(message); // Display the error message to the user
+      setError(message);
     }
   };
 
   return (
-    <div style={{ margin: "2rem" }}>
-      <h1>Login</h1>
-      <form onSubmit={handleLogin}>
-        <div>
-          <label>Username or Email:</label>
-          <input
-            type="text"
-            value={usernameOrEmail}
-            onChange={(e) => setUsernameOrEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <div className="login-container">
+      <div className="login-card">
+        <h2>Welcome Back</h2>
+        <p>Please login to access your profile</p>
+        <form onSubmit={handleLogin}>
+          <div className="input-group">
+            <label>Username or Email</label>
+            <input
+              type="text"
+              value={usernameOrEmail}
+              onChange={(e) => setUsernameOrEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="input-group">
+            <label>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className="login-button">
+            Login
+          </button>
+          {error && <p className="error-message">{error}</p>}
+        </form>
+      </div>
     </div>
   );
 }
