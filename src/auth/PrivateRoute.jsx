@@ -1,6 +1,6 @@
 // src/auth/PrivateRoute.jsx
-import React from "react";
 import { Navigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem("token");
@@ -11,5 +11,9 @@ function PrivateRoute({ children }) {
   }
   return children;
 }
+
+PrivateRoute.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 export default PrivateRoute;

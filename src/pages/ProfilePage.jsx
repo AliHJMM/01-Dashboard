@@ -1,8 +1,6 @@
 // src/pages/ProfilePage.jsx
-import React from "react";
 import { gql, useQuery } from "@apollo/client";
 
-// Define the GraphQL query
 const GET_USER_INFO = gql`
   query {
     user {
@@ -13,14 +11,12 @@ const GET_USER_INFO = gql`
 `;
 
 function ProfilePage() {
-  // Execute the query
   const { loading, error, data } = useQuery(GET_USER_INFO);
 
-  if (loading) return <p>Loading...</p>; // Show loading message
-  if (error) return <p>Error: {error.message}</p>; // Show error message
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
-  // Safely access the data and display it
-  const user = data?.user?.[0] || {}; // Assuming `user` is an array of objects
+  const user = data?.user?.[0] || {};
 
   return (
     <div style={{ margin: "2rem" }}>
