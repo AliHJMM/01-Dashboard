@@ -57,6 +57,36 @@ const GET_TOTAL_XP = gql`
   }
 `;
 
+// Query for audits (pass and fail)
+const GET_AUDITS = gql`
+  query {
+    user {
+      validAudits: audits_aggregate(
+        where: { grade: { _gte: 1 } }
+        order_by: { createdAt: desc }
+      ) {
+        nodes {
+          group {
+            captainLogin
+            createdAt
+          }
+        }
+      }
+      failedAudits: audits_aggregate(
+        where: { grade: { _lt: 1 } }
+        order_by: { createdAt: desc }
+      ) {
+        nodes {
+          group {
+            captainLogin
+            createdAt
+          }
+        }
+      }
+    }
+  }
+`;
+
 function ProfilePage() {
   // Queries
   const {
@@ -77,16 +107,23 @@ function ProfilePage() {
     data: totalXpData,
   } = useQuery(GET_TOTAL_XP);
 
-  if (userLoading || transactionsLoading || totalXpLoading)
+  const {
+    loading: auditsLoading,
+    error: auditsError,
+    data: auditsData,
+  } = useQuery(GET_AUDITS);
+
+  if (userLoading || transactionsLoading || totalXpLoading || auditsLoading)
     return <p className="loading">Loading...</p>;
 
-  if (userError || transactionsError || totalXpError)
+  if (userError || transactionsError || totalXpError || auditsError)
     return (
       <p className="error-message">
         Error:{" "}
         {userError?.message ||
           transactionsError?.message ||
-          totalXpError?.message}
+          totalXpError?.message ||
+          auditsError?.message}
       </p>
     );
 
@@ -96,8 +133,18 @@ function ProfilePage() {
   const totalXp =
     totalXpData?.transaction_aggregate?.aggregate?.sum?.amount || 0;
 
+  const validAudits = auditsData?.user?.[0]?.validAudits?.nodes || [];
+  const failedAudits = auditsData?.user?.[0]?.failedAudits?.nodes || [];
+
   return (
     <div className="profile-container">
+      {/* Welcome Section */}
+      <div className="profile-welcome">
+        <h1>
+          Welcome, {attrs.firstName || "User"} {attrs.lastName || ""}
+        </h1>
+      </div>
+
       {/* User Information Section */}
       <div className="profile-card">
         <h2>Your Profile</h2>
@@ -120,21 +167,6 @@ function ProfilePage() {
             </p>
             <p>
               <strong>Job Title:</strong> {attrs.jobtitle || "N/A"}
-            </p>
-            <p>
-              <strong>CPR Number:</strong> {attrs.CPRnumber || "N/A"}
-            </p>
-            <p>
-              <strong>First Name:</strong> {attrs.firstName || "N/A"}
-            </p>
-            <p>
-              <strong>Last Name:</strong> {attrs.lastName || "N/A"}
-            </p>
-            <p>
-              <strong>Date of Birth:</strong>{" "}
-              {attrs.dateOfBirth
-                ? new Date(attrs.dateOfBirth).toLocaleDateString()
-                : "N/A"}
             </p>
           </div>
         ) : (
@@ -170,6 +202,45 @@ function ProfilePage() {
           ) : (
             <p>No transactions found.</p>
           )}
+        </div>
+      </div>
+
+      {/* Audits Section */}
+      <div className="profile-card audits-section">
+        <h2>Audits</h2>
+        <div className="audits-container">
+          <div className="audit-column">
+            <h3>Passed Audits</h3>
+            <div className="audit-list">
+              {validAudits.map((audit, index) => (
+                <div key={index} className="audit-item">
+                  <p>
+                    <strong>Captain:</strong> {audit.group.captainLogin}
+                  </p>
+                  <p>
+                    <strong>Date:</strong>{" "}
+                    {new Date(audit.group.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="audit-column">
+            <h3>Failed Audits</h3>
+            <div className="audit-list">
+              {failedAudits.map((audit, index) => (
+                <div key={index} className="audit-item">
+                  <p>
+                    <strong>Captain:</strong> {audit.group.captainLogin}
+                  </p>
+                  <p>
+                    <strong>Date:</strong>{" "}
+                    {new Date(audit.group.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
