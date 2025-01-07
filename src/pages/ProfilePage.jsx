@@ -1,4 +1,3 @@
-// src/pages/ProfilePage.jsx
 import { gql, useQuery } from "@apollo/client";
 import "../styles/ProfilePage.css";
 
@@ -8,16 +7,27 @@ const GET_USER_INFO = gql`
     user {
       id
       login
+      email
+      attrs
     }
   }
 `;
 
-// Query for transaction history
+// Query for transactions (projects and exercises only)
 const GET_TRANSACTIONS = gql`
   query {
     transaction(
-      where: { type: { _eq: "xp" }, object: { type: { _eq: "project" } } }
-      order_by: { createdAt: asc }
+      where: {
+        type: { _eq: "xp" }
+        _or: [
+          { object: { type: { _eq: "project" } } }
+          {
+            object: { type: { _eq: "exercise" } }
+            event: { path: { _eq: "/bahrain/bh-module" } }
+          }
+        ]
+      }
+      order_by: { createdAt: desc }
     ) {
       amount
       createdAt
@@ -29,40 +39,102 @@ const GET_TRANSACTIONS = gql`
   }
 `;
 
+// Query for Total XP (specific to Bahrain Module)
+const GET_TOTAL_XP = gql`
+  query {
+    transaction_aggregate(
+      where: {
+        event: { path: { _eq: "/bahrain/bh-module" } }
+        type: { _eq: "xp" }
+      }
+    ) {
+      aggregate {
+        sum {
+          amount
+        }
+      }
+    }
+  }
+`;
+
 function ProfilePage() {
-  // Execute both queries
+  // Queries
   const {
     loading: userLoading,
     error: userError,
     data: userData,
   } = useQuery(GET_USER_INFO);
+
   const {
     loading: transactionsLoading,
     error: transactionsError,
     data: transactionsData,
   } = useQuery(GET_TRANSACTIONS);
 
-  if (userLoading || transactionsLoading)
+  const {
+    loading: totalXpLoading,
+    error: totalXpError,
+    data: totalXpData,
+  } = useQuery(GET_TOTAL_XP);
+
+  if (userLoading || transactionsLoading || totalXpLoading)
     return <p className="loading">Loading...</p>;
-  if (userError)
-    return <p className="error-message">Error: {userError.message}</p>;
-  if (transactionsError)
-    return <p className="error-message">Error: {transactionsError.message}</p>;
+
+  if (userError || transactionsError || totalXpError)
+    return (
+      <p className="error-message">
+        Error:{" "}
+        {userError?.message ||
+          transactionsError?.message ||
+          totalXpError?.message}
+      </p>
+    );
 
   const user = userData?.user?.[0];
+  const attrs = user?.attrs || {};
   const transactions = transactionsData?.transaction || [];
+  const totalXp =
+    totalXpData?.transaction_aggregate?.aggregate?.sum?.amount || 0;
 
   return (
     <div className="profile-container">
+      {/* User Information Section */}
       <div className="profile-card">
         <h2>Your Profile</h2>
         {user ? (
           <div className="user-info">
             <p>
-              <strong>User ID:</strong> {user.id}
+              <strong>Login:</strong> {user.login}
             </p>
             <p>
-              <strong>Username:</strong> {user.login}
+              <strong>Email:</strong> {user.email}
+            </p>
+            <p>
+              <strong>Degree:</strong> {attrs.Degree || "N/A"}
+            </p>
+            <p>
+              <strong>Country:</strong> {attrs.country || "N/A"}
+            </p>
+            <p>
+              <strong>Gender:</strong> {attrs.genders || "N/A"}
+            </p>
+            <p>
+              <strong>Job Title:</strong> {attrs.jobtitle || "N/A"}
+            </p>
+            <p>
+              <strong>CPR Number:</strong> {attrs.CPRnumber || "N/A"}
+            </p>
+            <p>
+              <strong>First Name:</strong> {attrs.firstName || "N/A"}
+            </p>
+            <p>
+              <strong>Last Name:</strong> {attrs.lastName || "N/A"}
+            </p>
+            <p>
+              <strong>Date of Birth:</strong>{" "}
+              {attrs.dateOfBirth
+                ? new Date(attrs.dateOfBirth).toLocaleDateString()
+                : "N/A"}
             </p>
           </div>
         ) : (
@@ -70,15 +142,21 @@ function ProfilePage() {
         )}
       </div>
 
+      {/* Total XP and Transactions Section */}
       <div className="profile-card">
-        <h2>Transaction History</h2>
-        {transactions.length > 0 ? (
-          <div className="transaction-list">
-            {transactions.map((transaction, index) => (
+        <h2>Total XP and Transactions</h2>
+        <p>
+          <strong>Total XP (Main Program):</strong> {totalXp}
+        </p>
+        <div className="transactions-list">
+          {transactions.length > 0 ? (
+            transactions.map((transaction, index) => (
               <div key={index} className="transaction-item">
                 <p>
-                  <strong>Project:</strong> {transaction.object.name} (
-                  {transaction.object.type})
+                  <strong>Type:</strong> {transaction.object.type}
+                </p>
+                <p>
+                  <strong>Name:</strong> {transaction.object.name}
                 </p>
                 <p>
                   <strong>XP Amount:</strong> {transaction.amount}
@@ -88,11 +166,11 @@ function ProfilePage() {
                   {new Date(transaction.createdAt).toLocaleDateString()}
                 </p>
               </div>
-            ))}
-          </div>
-        ) : (
-          <p>No transactions found.</p>
-        )}
+            ))
+          ) : (
+            <p>No transactions found.</p>
+          )}
+        </div>
       </div>
     </div>
   );
