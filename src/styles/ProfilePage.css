@@ -3,13 +3,15 @@ body {
     font-family: Arial, sans-serif;
     background-color: #f0f2f5;
     margin: 0;
+    padding: 0;
 }
 
 .profile-container {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    height: 100vh;
+    gap: 2rem;
+    padding: 2rem;
 }
 
 .profile-card {
@@ -17,18 +19,54 @@ body {
     padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    width: 350px;
-    text-align: center;
+    width: 90%;
+    max-width: 600px;
 }
 
 .profile-card h2 {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     font-size: 1.5rem;
+    text-align: center;
     color: #333;
 }
 
-.profile-card p {
+.user-info p,
+.transaction-item p {
     margin: 0.5rem 0;
     color: #555;
     font-size: 1rem;
+}
+
+.transaction-item strong {
+    color: #333;
+}
+
+.transaction-list {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.transaction-item {
+    margin-bottom: 1rem;
+    padding: 0.8rem;
+    border-bottom: 1px solid #ddd;
+}
+
+.transaction-item:last-child {
+    border-bottom: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .profile-card {
+        width: 100%;
+        padding: 1.5rem;
+    }
+
+    .profile-container {
+        padding: 1rem;
+    }
 }

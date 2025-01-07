@@ -2,9 +2,9 @@
 import { gql, useQuery } from "@apollo/client";
 import "../styles/ProfilePage.css";
 
-// Define the GraphQL query
+// Query for user info
 const GET_USER_INFO = gql`
-  query GetUserInfo {
+  query {
     user {
       id
       login
@@ -12,37 +12,87 @@ const GET_USER_INFO = gql`
   }
 `;
 
-function ProfilePage() {
-  // Execute the query
-  const { loading, error, data } = useQuery(GET_USER_INFO);
-
-  if (loading) return <p className="loading">Loading...</p>;
-  if (error) return <p className="error-message">Error: {error.message}</p>;
-
-  // Safely access the user data
-  const user = data?.user?.[0];
-
-  if (!user) {
-    return (
-      <div className="profile-container">
-        <div className="profile-card">
-          <h2>User Not Found</h2>
-          <p>No user information could be retrieved. Please try again.</p>
-        </div>
-      </div>
-    );
+// Query for transaction history
+const GET_TRANSACTIONS = gql`
+  query {
+    transaction(
+      where: { type: { _eq: "xp" }, object: { type: { _eq: "project" } } }
+      order_by: { createdAt: asc }
+    ) {
+      amount
+      createdAt
+      object {
+        name
+        type
+      }
+    }
   }
+`;
+
+function ProfilePage() {
+  // Execute both queries
+  const {
+    loading: userLoading,
+    error: userError,
+    data: userData,
+  } = useQuery(GET_USER_INFO);
+  const {
+    loading: transactionsLoading,
+    error: transactionsError,
+    data: transactionsData,
+  } = useQuery(GET_TRANSACTIONS);
+
+  if (userLoading || transactionsLoading)
+    return <p className="loading">Loading...</p>;
+  if (userError)
+    return <p className="error-message">Error: {userError.message}</p>;
+  if (transactionsError)
+    return <p className="error-message">Error: {transactionsError.message}</p>;
+
+  const user = userData?.user?.[0];
+  const transactions = transactionsData?.transaction || [];
 
   return (
     <div className="profile-container">
       <div className="profile-card">
         <h2>Your Profile</h2>
-        <p>
-          <strong>User ID:</strong> {user.id}
-        </p>
-        <p>
-          <strong>Username:</strong> {user.login}
-        </p>
+        {user ? (
+          <div className="user-info">
+            <p>
+              <strong>User ID:</strong> {user.id}
+            </p>
+            <p>
+              <strong>Username:</strong> {user.login}
+            </p>
+          </div>
+        ) : (
+          <p>No user information available.</p>
+        )}
+      </div>
+
+      <div className="profile-card">
+        <h2>Transaction History</h2>
+        {transactions.length > 0 ? (
+          <div className="transaction-list">
+            {transactions.map((transaction, index) => (
+              <div key={index} className="transaction-item">
+                <p>
+                  <strong>Project:</strong> {transaction.object.name} (
+                  {transaction.object.type})
+                </p>
+                <p>
+                  <strong>XP Amount:</strong> {transaction.amount}
+                </p>
+                <p>
+                  <strong>Date:</strong>{" "}
+                  {new Date(transaction.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p>No transactions found.</p>
+        )}
       </div>
     </div>
   );
