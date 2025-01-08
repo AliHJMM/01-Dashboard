@@ -1,5 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import "../styles/ProfilePage.css";
+import { ResponsiveContainer, BarChart, Bar, XAxis, Tooltip } from "recharts";
 
 // Query for user info
 const GET_USER_INFO = gql`
@@ -99,7 +100,6 @@ const GET_AUDIT_STATS = gql`
 `;
 
 function ProfilePage() {
-  // Queries
   const {
     loading: userLoading,
     error: userError,
@@ -125,9 +125,9 @@ function ProfilePage() {
   } = useQuery(GET_AUDITS);
 
   const {
-    loading: auditStatsLoading,
-    error: auditStatsError,
-    data: auditStatsData,
+    loading: statsLoading,
+    error: statsError,
+    data: statsData,
   } = useQuery(GET_AUDIT_STATS);
 
   if (
@@ -135,7 +135,7 @@ function ProfilePage() {
     transactionsLoading ||
     totalXpLoading ||
     auditsLoading ||
-    auditStatsLoading
+    statsLoading
   )
     return <p className="loading">Loading...</p>;
 
@@ -144,7 +144,7 @@ function ProfilePage() {
     transactionsError ||
     totalXpError ||
     auditsError ||
-    auditStatsError
+    statsError
   )
     return (
       <p className="error-message">
@@ -153,7 +153,7 @@ function ProfilePage() {
           transactionsError?.message ||
           totalXpError?.message ||
           auditsError?.message ||
-          auditStatsError?.message}
+          statsError?.message}
       </p>
     );
 
@@ -166,9 +166,28 @@ function ProfilePage() {
   const validAudits = auditsData?.user?.[0]?.validAudits?.nodes || [];
   const failedAudits = auditsData?.user?.[0]?.failedAudits?.nodes || [];
 
-  const auditRatio = auditStatsData?.user?.[0]?.auditRatio || 0;
-  const totalUp = auditStatsData?.user?.[0]?.totalUp || 0;
-  const totalDown = auditStatsData?.user?.[0]?.totalDown || 0;
+  const auditRatio = statsData?.user?.[0]?.auditRatio || 0;
+  const totalUp = statsData?.user?.[0]?.totalUp || 0;
+  const totalDown = statsData?.user?.[0]?.totalDown || 0;
+
+  const auditData = [
+    { name: "Up", value: totalUp },
+    { name: "Down", value: totalDown },
+  ];
+
+  const auditRatioValue = parseFloat(auditRatio) || 0; // Convert to a number or default to 0
+
+  // Determine auditRatio color and message
+  let auditRatioColor = "red";
+  let auditRatioMessage = "Careful buddy!"; // Default message for ratios under 1
+
+  if (auditRatioValue >= 1.5) {
+    auditRatioColor = "green";
+    auditRatioMessage = "Awesome, buddy!";
+  } else if (auditRatioValue >= 1 && auditRatioValue < 1.5) {
+    auditRatioColor = "yellow";
+    auditRatioMessage = "Keep it up, buddy!";
+  }
 
   return (
     <div className="profile-container">
@@ -278,18 +297,41 @@ function ProfilePage() {
         </div>
       </div>
 
-      {/* Audit Statistics Section */}
+      {/* Audit Ratio Section */}
+      <div className="profile-card">
+        <h2>Audit Ratio</h2>
+        <div
+          className="audit-ratio"
+          style={{
+            fontSize: "2rem",
+            color: auditRatioColor,
+            textAlign: "center",
+          }}
+        >
+          {auditRatioValue.toFixed(2)}
+        </div>
+        <p
+          style={{
+            fontSize: "1.2rem",
+            color: auditRatioColor,
+            textAlign: "center",
+            marginTop: "0.5rem",
+          }}
+        >
+          {auditRatioMessage}
+        </p>
+      </div>
+
+      {/* Audit Statistics Graph Section */}
       <div className="profile-card">
         <h2>Audit Statistics</h2>
-        <p>
-          <strong>Total Audits Sent:</strong> {totalUp}
-        </p>
-        <p>
-          <strong>Total Audits Received:</strong> {totalDown}
-        </p>
-        <p>
-          <strong>Audit Ratio:</strong> {auditRatio.toFixed(2)}
-        </p>
+        <ResponsiveContainer width="100%" height={200}>
+          <BarChart data={auditData}>
+            <XAxis dataKey="name" />
+            <Tooltip />
+            <Bar dataKey="value" fill="#8884d8" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
