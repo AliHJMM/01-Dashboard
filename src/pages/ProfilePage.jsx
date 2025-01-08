@@ -87,6 +87,17 @@ const GET_AUDITS = gql`
   }
 `;
 
+// Query for audit statistics
+const GET_AUDIT_STATS = gql`
+  query {
+    user {
+      auditRatio
+      totalUp
+      totalDown
+    }
+  }
+`;
+
 function ProfilePage() {
   // Queries
   const {
@@ -113,17 +124,36 @@ function ProfilePage() {
     data: auditsData,
   } = useQuery(GET_AUDITS);
 
-  if (userLoading || transactionsLoading || totalXpLoading || auditsLoading)
+  const {
+    loading: auditStatsLoading,
+    error: auditStatsError,
+    data: auditStatsData,
+  } = useQuery(GET_AUDIT_STATS);
+
+  if (
+    userLoading ||
+    transactionsLoading ||
+    totalXpLoading ||
+    auditsLoading ||
+    auditStatsLoading
+  )
     return <p className="loading">Loading...</p>;
 
-  if (userError || transactionsError || totalXpError || auditsError)
+  if (
+    userError ||
+    transactionsError ||
+    totalXpError ||
+    auditsError ||
+    auditStatsError
+  )
     return (
       <p className="error-message">
         Error:{" "}
         {userError?.message ||
           transactionsError?.message ||
           totalXpError?.message ||
-          auditsError?.message}
+          auditsError?.message ||
+          auditStatsError?.message}
       </p>
     );
 
@@ -135,6 +165,10 @@ function ProfilePage() {
 
   const validAudits = auditsData?.user?.[0]?.validAudits?.nodes || [];
   const failedAudits = auditsData?.user?.[0]?.failedAudits?.nodes || [];
+
+  const auditRatio = auditStatsData?.user?.[0]?.auditRatio || 0;
+  const totalUp = auditStatsData?.user?.[0]?.totalUp || 0;
+  const totalDown = auditStatsData?.user?.[0]?.totalDown || 0;
 
   return (
     <div className="profile-container">
@@ -242,6 +276,20 @@ function ProfilePage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Audit Statistics Section */}
+      <div className="profile-card">
+        <h2>Audit Statistics</h2>
+        <p>
+          <strong>Total Audits Sent:</strong> {totalUp}
+        </p>
+        <p>
+          <strong>Total Audits Received:</strong> {totalDown}
+        </p>
+        <p>
+          <strong>Audit Ratio:</strong> {auditRatio.toFixed(2)}
+        </p>
       </div>
     </div>
   );
