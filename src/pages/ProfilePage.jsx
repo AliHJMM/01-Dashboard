@@ -1,6 +1,16 @@
 import { gql, useQuery } from "@apollo/client";
 import "../styles/ProfilePage.css";
-import { ResponsiveContainer, BarChart, Bar, XAxis, Tooltip } from "recharts";
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  BarChart,
+  Bar,
+} from "recharts";
 
 // Query for user info
 const GET_USER_INFO = gql`
@@ -28,7 +38,7 @@ const GET_TRANSACTIONS = gql`
           }
         ]
       }
-      order_by: { createdAt: desc }
+      order_by: { createdAt: asc }
     ) {
       amount
       createdAt
@@ -189,6 +199,12 @@ function ProfilePage() {
     auditRatioMessage = "Keep it up, buddy!";
   }
 
+  // Prepare data for the XP over time line chart
+  const xpData = transactions.map((transaction) => ({
+    date: new Date(transaction.createdAt).toLocaleDateString(),
+    xp: transaction.amount,
+  }));
+
   return (
     <div className="profile-container">
       {/* Welcome Section */}
@@ -258,6 +274,25 @@ function ProfilePage() {
         </div>
       </div>
 
+      {/* XP Over Time Line Chart */}
+      <div className="profile-card">
+        <h2>XP Over Time</h2>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={xpData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Tooltip />
+            <Line
+              type="monotone"
+              dataKey="xp"
+              stroke="#8884d8"
+              strokeWidth={2}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
       {/* Audits Section */}
       <div className="profile-card audits-section">
         <h2>Audits</h2>
@@ -297,43 +332,39 @@ function ProfilePage() {
         </div>
       </div>
 
-      {/* Audit Ratio Section */}
-      <div className="profile-card">
-        <h2>Audit Ratio</h2>
-        <div
-          className="audit-ratio"
-          style={{
-            fontSize: "2rem",
-            color: auditRatioColor,
-            textAlign: "center",
-          }}
-        >
-          {auditRatioValue.toFixed(2)}
+      {/* Combined Audit Ratio and Statistics Section */}
+      <div className="profile-card combined-audit-section">
+        <h2>Audit Overview</h2>
+        <div className="audit-overview-container">
+          {/* Audit Ratio */}
+          <div
+            className="audit-ratio"
+            style={{
+              fontSize: "2rem",
+              color: auditRatioColor,
+              textAlign: "center",
+            }}
+          >
+            {auditRatioValue.toFixed(2)}
+            <p
+              style={{
+                fontSize: "1.2rem",
+                color: auditRatioColor,
+                marginTop: "0.5rem",
+              }}
+            >
+              {auditRatioMessage}
+            </p>
+          </div>
+          {/* Audit Graph */}
+          <ResponsiveContainer width={200} height={200}>
+            <BarChart data={auditData}>
+              <XAxis dataKey="name" />
+              <Tooltip />
+              <Bar dataKey="value" fill="#8884d8" radius={[10, 10, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
-        <p
-          style={{
-            fontSize: "1.2rem",
-            color: auditRatioColor,
-            textAlign: "center",
-            marginTop: "0.5rem",
-          }}
-        >
-          {auditRatioMessage}
-        </p>
-      </div>
-
-      {/* Audit Statistics Graph Section */}
-      {/* Audit Statistics Graph Section */}
-      {/* Audit Statistics Graph Section */}
-      <div className="profile-card">
-        <h2>Audit Statistics</h2>
-        <ResponsiveContainer width="25%" height={400}>
-          <BarChart data={auditData}>
-            <XAxis dataKey="name" />
-            <Tooltip />
-            <Bar dataKey="value" fill="#8884d8" radius={[10, 10, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
       </div>
     </div>
   );
