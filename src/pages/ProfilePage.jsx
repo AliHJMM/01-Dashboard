@@ -10,6 +10,11 @@ import {
   CartesianGrid,
   BarChart,
   Bar,
+  RadarChart,
+  Radar,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
 } from "recharts";
 
 // Query for user info
@@ -109,6 +114,25 @@ const GET_AUDIT_STATS = gql`
   }
 `;
 
+// New Query for Technical Skills
+const GET_TECHNICAL_SKILLS = gql`
+  query {
+    transaction(
+      where: {
+        _and: [
+          { type: { _ilike: "%skill%" } }
+          { object: { type: { _eq: "project" } } }
+        ]
+      }
+      order_by: [{ type: asc }, { createdAt: desc }]
+      distinct_on: type
+    ) {
+      amount
+      type
+    }
+  }
+`;
+
 function ProfilePage() {
   const {
     loading: userLoading,
@@ -140,12 +164,19 @@ function ProfilePage() {
     data: statsData,
   } = useQuery(GET_AUDIT_STATS);
 
+  const {
+    loading: skillsLoading,
+    error: skillsError,
+    data: skillsData,
+  } = useQuery(GET_TECHNICAL_SKILLS);
+
   if (
     userLoading ||
     transactionsLoading ||
     totalXpLoading ||
     auditsLoading ||
-    statsLoading
+    statsLoading ||
+    skillsLoading
   )
     return <p className="loading">Loading...</p>;
 
@@ -154,7 +185,8 @@ function ProfilePage() {
     transactionsError ||
     totalXpError ||
     auditsError ||
-    statsError
+    statsError ||
+    skillsError
   )
     return (
       <p className="error-message">
@@ -163,7 +195,8 @@ function ProfilePage() {
           transactionsError?.message ||
           totalXpError?.message ||
           auditsError?.message ||
-          statsError?.message}
+          statsError?.message ||
+          skillsError?.message}
       </p>
     );
 
@@ -184,6 +217,13 @@ function ProfilePage() {
     { name: "Up", value: totalUp },
     { name: "Down", value: totalDown },
   ];
+
+  // Radar Chart Data for Skills
+  const radarData = skillsData?.transaction.map((skill) => ({
+    subject: skill.type,
+    value: skill.amount,
+    fullMark: 100,
+  }));
 
   const auditRatioValue = parseFloat(auditRatio) || 0; // Convert to a number or default to 0
 
@@ -363,6 +403,24 @@ function ProfilePage() {
               <Tooltip />
               <Bar dataKey="value" fill="#8884d8" radius={[10, 10, 0, 0]} />
             </BarChart>
+          </ResponsiveContainer>
+        </div>
+        {/* Technical Skills Radar Chart */}
+        <div className="profile-card">
+          <h2>Technical Skills</h2>
+          <ResponsiveContainer width="100%" height={400}>
+            <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
+              <PolarGrid />
+              <PolarAngleAxis dataKey="subject" />
+              <PolarRadiusAxis />
+              <Radar
+                name="Skills"
+                dataKey="value"
+                stroke="#8884d8"
+                fill="#8884d8"
+                fillOpacity={0.6}
+              />
+            </RadarChart>
           </ResponsiveContainer>
         </div>
       </div>
