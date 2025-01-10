@@ -276,120 +276,42 @@ function ProfilePage() {
         <h1 className="profile-name">{`${attrs.firstName || "User"} ${
           attrs.lastName || ""
         }`}</h1>
-        <p className="profile-username">
-          <strong>Username:</strong> {user?.login || "N/A"}
-        </p>
       </div>
 
+      {/* Information Section */}
       {/* Information Section */}
       <div className="profile-information">
         <h2>Information</h2>
         <div className="info-grid">
-          <div className="row">
-            <p>
-              <strong>Email:</strong> {user?.email || "N/A"}
-            </p>
-            <p>
-              <strong>Country:</strong> {attrs.country || "N/A"}
-            </p>
+          <div className="info-card">
+            <p className="info-label">Username:</p>
+            <p className="info-value">{user?.login || "N/A"}</p>
           </div>
-          <div className="row">
-            <p>
-              <strong>Degree:</strong> {attrs.Degree || "N/A"}
-            </p>
-            <p>
-              <strong>Gender:</strong> {attrs.genders || "N/A"}
-            </p>
+          <div className="info-card">
+            <p className="info-label">CPR:</p>
+            <p className="info-value">{attrs?.CPRnumber || "N/A"}</p>
           </div>
-          <div className="row">
-            <p>
-              <strong>Job Title:</strong> {attrs.jobtitle || "N/A"}
-            </p>
+          <div className="info-card">
+            <p className="info-label">Email:</p>
+            <p className="info-value">{user?.email || "N/A"}</p>
+          </div>
+          <div className="info-card">
+            <p className="info-label">Country:</p>
+            <p className="info-value">{attrs?.country || "N/A"}</p>
+          </div>
+          <div className="info-card">
+            <p className="info-label">Degree:</p>
+            <p className="info-value">{attrs?.Degree || "N/A"}</p>
+          </div>
+          <div className="info-card">
+            <p className="info-label">Gender:</p>
+            <p className="info-value">{attrs?.genders || "N/A"}</p>
           </div>
         </div>
       </div>
 
-      {/* XP Progress Section */}
-      <div className="xp-chart-container">
-        <h2 className="xp-chart-title">XP Progress</h2>
-        <div className="xp-stats">
-          <span className="user-level">Level {level}</span>{" "}
-          {/* Replace with calculated level */}
-          <span className="user-xp">{totalXp} XP</span>
-        </div>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={xpDataToUse}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" stroke="#c7c7c7" />
-            <YAxis stroke="#c7c7c7" />
-            <Tooltip
-              content={({ active, payload }) => {
-                if (active && payload && payload.length) {
-                  const { date, xp, type, name } = payload[0].payload; // Extract additional data
-                  return (
-                    <div
-                      className="custom-tooltip"
-                      style={{
-                        backgroundColor: "#2a2a3e",
-                        padding: "10px",
-                        color: "#fff",
-                      }}
-                    >
-                      <p>
-                        <strong>Date:</strong> {date}
-                      </p>
-                      <p>
-                        <strong>XP:</strong> {xp}
-                      </p>
-                      <p>
-                        <strong>Type:</strong> {type}
-                      </p>
-                      <p>
-                        <strong>Name:</strong> {name}
-                      </p>
-                    </div>
-                  );
-                }
-                return null;
-              }}
-            />
-            <Line
-              type="monotone"
-              dataKey="xp"
-              stroke="#29d5a4"
-              strokeWidth={2}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Total XP and Transactions Section */}
-      <div className="transactions-container">
-        <h2 className="transactions-title">Projects</h2>
-        <div className="transactions-list">
-          {transactions.length > 0 ? (
-            transactions.map((transaction, index) => (
-              <div key={index} className="transaction-item">
-                <div className="transaction-details">
-                  <h3 className="transaction-name">
-                    {transaction.object.name}
-                  </h3>
-                  <p className="transaction-type">
-                    <strong>Type:</strong> {transaction.object.type}
-                  </p>
-                </div>
-                <div className="transaction-xp">
-                  <span className="xp-value">+{transaction.amount} XP</span>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="no-transactions">No transactions found.</p>
-          )}
-        </div>
-      </div>
-
-      <div className="profile-card audit-status-container">
+      {/* Audits Section */}
+      <div className="audit-status-container">
         <h2>Audits</h2>
         <div className="audit-status-list">
           {validAudits.map((audit, index) => (
@@ -421,55 +343,73 @@ function ProfilePage() {
             </div>
           ))}
         </div>
+      </div>
 
-        {/* Combined Audit Overview */}
-        <div className="audit-overview-container">
-          <h2 className="audit-overview-title">Audit Overview</h2>
-
-          {/* Audit Ratio */}
-          <div className="audit-ratio-container">
-            <p className="audit-ratio">
-              <strong>Audit Ratio:</strong>{" "}
-              <span style={{ color: auditRatioColor }}>
-                {auditRatioValue.toFixed(2)}
-              </span>
-            </p>
-            <p className="audit-message">{auditRatioMessage}</p>
-          </div>
-
-          {/* Audit Bar Chart */}
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={auditData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#2e2e40" />
-              <XAxis dataKey="name" stroke="#c7c7c7" />
-              <YAxis stroke="#c7c7c7" />
-              <Tooltip
-                content={({ active, payload }) => {
-                  if (active && payload && payload.length) {
-                    const { name, value } = payload[0].payload;
-                    return (
-                      <div
-                        style={{
-                          backgroundColor: "#1a1a2e",
-                          padding: "10px",
-                          border: "1px solid #9b59b6",
-                          color: "#ffffff",
-                        }}
-                      >
-                        <p>
-                          <strong>{name}:</strong> {value}
-                        </p>
-                      </div>
-                    );
-                  }
-                  return null;
-                }}
-                cursor={{ fill: "rgba(155, 89, 182, 0.2)" }}
-              />
-              <Bar dataKey="value" fill="#9b59b6" radius={[10, 10, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+      {/* Transactions Section */}
+      <div className="transactions-container">
+        <h2 className="transactions-title">Projects</h2>
+        <div className="transactions-list">
+          {transactions.map((transaction, index) => (
+            <div key={index} className="transaction-item">
+              <div className="transaction-details">
+                <h3 className="transaction-name">{transaction.object.name}</h3>
+                <p className="transaction-type">
+                  <strong>Type:</strong> {transaction.object.type}
+                </p>
+              </div>
+              <div className="transaction-xp">
+                <span className="xp-value">+{transaction.amount} XP</span>
+              </div>
+            </div>
+          ))}
         </div>
+      </div>
+
+      {/* Graphs Section */}
+      {/* XP Progress */}
+      <div className="xp-chart-container">
+        <h2 className="xp-chart-title">XP Progress</h2>
+        <div className="xp-stats">
+          <span className="user-level">Level {level}</span>
+          <span className="user-xp">{totalXp} XP</span>
+        </div>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={xpDataToUse}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" stroke="#c7c7c7" />
+            <YAxis stroke="#c7c7c7" />
+            <Tooltip />
+            <Line
+              type="monotone"
+              dataKey="xp"
+              stroke="#29d5a4"
+              strokeWidth={2}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Audit Overview */}
+      <div className="audit-overview-container">
+        <h2 className="audit-overview-title">Audit Overview</h2>
+        <div className="audit-ratio-container">
+          <p className="audit-ratio">
+            <strong>Audit Ratio:</strong>{" "}
+            <span style={{ color: auditRatioColor }}>
+              {auditRatioValue.toFixed(2)}
+            </span>
+          </p>
+          <p className="audit-message">{auditRatioMessage}</p>
+        </div>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={auditData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" stroke="#c7c7c7" />
+            <YAxis stroke="#c7c7c7" />
+            <Tooltip />
+            <Bar dataKey="value" fill="#9b59b6" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
 
       {/* Radar Chart */}
