@@ -8,16 +8,16 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  BarChart,
-  Bar,
   RadarChart,
   Radar,
   PolarGrid,
   PolarAngleAxis,
   PolarRadiusAxis,
+  BarChart,
+  Bar,
 } from "recharts";
 
-// Query for user info
+// Queries
 const GET_USER_INFO = gql`
   query {
     user {
@@ -29,7 +29,6 @@ const GET_USER_INFO = gql`
   }
 `;
 
-// Query for transactions (projects and exercises only)
 const GET_TRANSACTIONS = gql`
   query {
     transaction(
@@ -55,7 +54,6 @@ const GET_TRANSACTIONS = gql`
   }
 `;
 
-// Query for Total XP (specific to Bahrain Module)
 const GET_TOTAL_XP = gql`
   query {
     transaction_aggregate(
@@ -73,7 +71,6 @@ const GET_TOTAL_XP = gql`
   }
 `;
 
-// Query for audits (pass and fail)
 const GET_AUDITS = gql`
   query {
     user {
@@ -103,7 +100,6 @@ const GET_AUDITS = gql`
   }
 `;
 
-// Query for audit statistics
 const GET_AUDIT_STATS = gql`
   query {
     user {
@@ -114,7 +110,6 @@ const GET_AUDIT_STATS = gql`
   }
 `;
 
-// New Query for Technical Skills
 const GET_TECHNICAL_SKILLS = gql`
   query {
     transaction(
@@ -133,42 +128,55 @@ const GET_TECHNICAL_SKILLS = gql`
   }
 `;
 
+const GET_TOP_TRANSACTION = gql`
+  query {
+    transaction(
+      order_by: { amount: desc }
+      limit: 1
+      where: { type: { _eq: "level" }, path: { _like: "/bahrain/bh-module%" } }
+    ) {
+      amount
+    }
+  }
+`;
+
 function ProfilePage() {
   const {
     loading: userLoading,
     error: userError,
     data: userData,
   } = useQuery(GET_USER_INFO);
-
   const {
     loading: transactionsLoading,
     error: transactionsError,
     data: transactionsData,
   } = useQuery(GET_TRANSACTIONS);
-
   const {
     loading: totalXpLoading,
     error: totalXpError,
     data: totalXpData,
   } = useQuery(GET_TOTAL_XP);
-
   const {
     loading: auditsLoading,
     error: auditsError,
     data: auditsData,
   } = useQuery(GET_AUDITS);
-
   const {
     loading: statsLoading,
     error: statsError,
     data: statsData,
   } = useQuery(GET_AUDIT_STATS);
-
   const {
     loading: skillsLoading,
     error: skillsError,
     data: skillsData,
   } = useQuery(GET_TECHNICAL_SKILLS);
+
+  const {
+    loading: levelLoading,
+    error: levelError,
+    data: levelData,
+  } = useQuery(GET_TOP_TRANSACTION);
 
   if (
     userLoading ||
@@ -176,7 +184,8 @@ function ProfilePage() {
     totalXpLoading ||
     auditsLoading ||
     statsLoading ||
-    skillsLoading
+    skillsLoading ||
+    levelLoading
   )
     return <p className="loading">Loading...</p>;
 
@@ -186,7 +195,8 @@ function ProfilePage() {
     totalXpError ||
     auditsError ||
     statsError ||
-    skillsError
+    skillsError ||
+    levelError
   )
     return (
       <p className="error-message">
@@ -196,41 +206,61 @@ function ProfilePage() {
           totalXpError?.message ||
           auditsError?.message ||
           statsError?.message ||
-          skillsError?.message}
+          skillsError?.message ||
+          levelError?.message}
       </p>
     );
 
+  // User Data
   const user = userData?.user?.[0];
   const attrs = user?.attrs || {};
+  const level = levelData?.transaction?.[0]?.amount || "N/A"; // Fetch level from query
+
+  // XP and Transactions Data
   const transactions = transactionsData?.transaction || [];
   const totalXp =
     totalXpData?.transaction_aggregate?.aggregate?.sum?.amount || 0;
+  const xpData = transactions.map((transaction) => ({
+    date: new Date(transaction.createdAt).toLocaleDateString(),
+    xp: transaction.amount,
+  }));
 
+  // Fallback XP Data
+  const fallbackXpData = [
+    { date: "2023-01-01", xp: 100 },
+    { date: "2023-02-01", xp: 200 },
+  ];
+  const xpDataToUse = xpData.length ? xpData : fallbackXpData;
+
+  // Audits Data
   const validAudits = auditsData?.user?.[0]?.validAudits?.nodes || [];
   const failedAudits = auditsData?.user?.[0]?.failedAudits?.nodes || [];
-
   const auditRatio = statsData?.user?.[0]?.auditRatio || 0;
   const totalUp = statsData?.user?.[0]?.totalUp || 0;
   const totalDown = statsData?.user?.[0]?.totalDown || 0;
 
+  // Audit Graph Data
   const auditData = [
     { name: "Up", value: totalUp },
     { name: "Down", value: totalDown },
   ];
 
-  // Radar Chart Data for Skills
+  // Radar Chart Data
   const radarData = skillsData?.transaction.map((skill) => ({
     subject: skill.type,
     value: skill.amount,
     fullMark: 100,
   }));
+  const fallbackRadarData = [
+    { subject: "JavaScript", value: 80, fullMark: 100 },
+    { subject: "React", value: 90, fullMark: 100 },
+  ];
+  const radarDataToUse = radarData.length ? radarData : fallbackRadarData;
 
-  const auditRatioValue = parseFloat(auditRatio) || 0; // Convert to a number or default to 0
-
-  // Determine auditRatio color and message
+  // Audit Ratio Display
+  const auditRatioValue = parseFloat(auditRatio) || 0;
   let auditRatioColor = "red";
-  let auditRatioMessage = "Careful buddy!"; // Default message for ratios under 1
-
+  let auditRatioMessage = "Careful buddy!";
   if (auditRatioValue >= 1.5) {
     auditRatioColor = "green";
     auditRatioMessage = "Awesome, buddy!";
@@ -239,190 +269,226 @@ function ProfilePage() {
     auditRatioMessage = "Keep it up, buddy!";
   }
 
-  // Prepare data for the XP over time line chart
-  const xpData = transactions.map((transaction) => ({
-    date: new Date(transaction.createdAt).toLocaleDateString(),
-    xp: transaction.amount,
-  }));
-
   return (
     <div className="profile-container">
-      {/* Welcome Section */}
-      <div className="profile-welcome">
-        <h1>
-          Welcome, {attrs.firstName || "User"} {attrs.lastName || ""}
-        </h1>
+      {/* Header Section */}
+      <div className="profile-header">
+        <h1 className="profile-name">{`${attrs.firstName || "User"} ${
+          attrs.lastName || ""
+        }`}</h1>
+        <p className="profile-username">
+          <strong>Username:</strong> {user?.login || "N/A"}
+        </p>
       </div>
 
-      {/* User Information Section */}
-      <div className="profile-card">
-        <h2>Your Profile</h2>
-        {user ? (
-          <div className="user-info">
+      {/* Information Section */}
+      <div className="profile-information">
+        <h2>Information</h2>
+        <div className="info-grid">
+          <div className="row">
             <p>
-              <strong>Login:</strong> {user.login}
-            </p>
-            <p>
-              <strong>Email:</strong> {user.email}
-            </p>
-            <p>
-              <strong>Degree:</strong> {attrs.Degree || "N/A"}
+              <strong>Email:</strong> {user?.email || "N/A"}
             </p>
             <p>
               <strong>Country:</strong> {attrs.country || "N/A"}
             </p>
+          </div>
+          <div className="row">
+            <p>
+              <strong>Degree:</strong> {attrs.Degree || "N/A"}
+            </p>
             <p>
               <strong>Gender:</strong> {attrs.genders || "N/A"}
             </p>
+          </div>
+          <div className="row">
             <p>
               <strong>Job Title:</strong> {attrs.jobtitle || "N/A"}
             </p>
           </div>
-        ) : (
-          <p>No user information available.</p>
-        )}
-      </div>
-
-      {/* Total XP and Transactions Section */}
-      <div className="profile-card">
-        <h2>Total XP and Transactions</h2>
-        <p>
-          <strong>Total XP (Main Program):</strong> {totalXp}
-        </p>
-        <div className="transactions-list">
-          {transactions.length > 0 ? (
-            transactions.map((transaction, index) => (
-              <div key={index} className="transaction-item">
-                <p>
-                  <strong>Type:</strong> {transaction.object.type}
-                </p>
-                <p>
-                  <strong>Name:</strong> {transaction.object.name}
-                </p>
-                <p>
-                  <strong>XP Amount:</strong> {transaction.amount}
-                </p>
-                <p>
-                  <strong>Date:</strong>{" "}
-                  {new Date(transaction.createdAt).toLocaleDateString()}
-                </p>
-              </div>
-            ))
-          ) : (
-            <p>No transactions found.</p>
-          )}
         </div>
       </div>
 
-      {/* XP Over Time Line Chart */}
-      <div className="profile-card">
-        <h2>XP Over Time</h2>
+      {/* XP Progress Section */}
+      <div className="xp-chart-container">
+        <h2 className="xp-chart-title">XP Progress</h2>
+        <div className="xp-stats">
+          <span className="user-level">Level {level}</span>{" "}
+          {/* Replace with calculated level */}
+          <span className="user-xp">{totalXp} XP</span>
+        </div>
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={xpData}>
+          <LineChart data={xpDataToUse}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Tooltip />
+            <XAxis dataKey="date" stroke="#c7c7c7" />
+            <YAxis stroke="#c7c7c7" />
+            <Tooltip
+              content={({ active, payload }) => {
+                if (active && payload && payload.length) {
+                  const { date, xp, type, name } = payload[0].payload; // Extract additional data
+                  return (
+                    <div
+                      className="custom-tooltip"
+                      style={{
+                        backgroundColor: "#2a2a3e",
+                        padding: "10px",
+                        color: "#fff",
+                      }}
+                    >
+                      <p>
+                        <strong>Date:</strong> {date}
+                      </p>
+                      <p>
+                        <strong>XP:</strong> {xp}
+                      </p>
+                      <p>
+                        <strong>Type:</strong> {type}
+                      </p>
+                      <p>
+                        <strong>Name:</strong> {name}
+                      </p>
+                    </div>
+                  );
+                }
+                return null;
+              }}
+            />
             <Line
               type="monotone"
               dataKey="xp"
-              stroke="#8884d8"
+              stroke="#29d5a4"
               strokeWidth={2}
             />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Audits Section */}
-      <div className="profile-card audits-section">
-        <h2>Audits</h2>
-        <div className="audits-container">
-          <div className="audit-column">
-            <h3>Passed Audits</h3>
-            <div className="audit-list">
-              {validAudits.map((audit, index) => (
-                <div key={index} className="audit-item">
-                  <p>
-                    <strong>Captain:</strong> {audit.group.captainLogin}
-                  </p>
-                  <p>
-                    <strong>Date:</strong>{" "}
-                    {new Date(audit.group.createdAt).toLocaleDateString()}
+      {/* Total XP and Transactions Section */}
+      <div className="transactions-container">
+        <h2 className="transactions-title">Projects</h2>
+        <div className="transactions-list">
+          {transactions.length > 0 ? (
+            transactions.map((transaction, index) => (
+              <div key={index} className="transaction-item">
+                <div className="transaction-details">
+                  <h3 className="transaction-name">
+                    {transaction.object.name}
+                  </h3>
+                  <p className="transaction-type">
+                    <strong>Type:</strong> {transaction.object.type}
                   </p>
                 </div>
-              ))}
-            </div>
-          </div>
-          <div className="audit-column">
-            <h3>Failed Audits</h3>
-            <div className="audit-list">
-              {failedAudits.map((audit, index) => (
-                <div key={index} className="audit-item">
-                  <p>
-                    <strong>Captain:</strong> {audit.group.captainLogin}
-                  </p>
-                  <p>
-                    <strong>Date:</strong>{" "}
-                    {new Date(audit.group.createdAt).toLocaleDateString()}
-                  </p>
+                <div className="transaction-xp">
+                  <span className="xp-value">+{transaction.amount} XP</span>
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
+            ))
+          ) : (
+            <p className="no-transactions">No transactions found.</p>
+          )}
         </div>
       </div>
 
-      {/* Combined Audit Ratio and Statistics Section */}
-      <div className="profile-card combined-audit-section">
-        <h2>Audit Overview</h2>
+      <div className="profile-card audit-status-container">
+        <h2>Audits</h2>
+        <div className="audit-status-list">
+          {validAudits.map((audit, index) => (
+            <div key={`valid-${index}`} className="audit-status-item">
+              <span className="audit-icon success">✔️</span>
+              <div className="audit-info">
+                <p className="audit-title">
+                  <strong>Captain:</strong> {audit.group.captainLogin}
+                </p>
+                <p className="audit-date">
+                  <strong>Date:</strong>{" "}
+                  {new Date(audit.group.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+          ))}
+          {failedAudits.map((audit, index) => (
+            <div key={`failed-${index}`} className="audit-status-item">
+              <span className="audit-icon fail">❌</span>
+              <div className="audit-info">
+                <p className="audit-title">
+                  <strong>Captain:</strong> {audit.group.captainLogin}
+                </p>
+                <p className="audit-date">
+                  <strong>Date:</strong>{" "}
+                  {new Date(audit.group.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Combined Audit Overview */}
         <div className="audit-overview-container">
+          <h2 className="audit-overview-title">Audit Overview</h2>
+
           {/* Audit Ratio */}
-          <div
-            className="audit-ratio"
-            style={{
-              fontSize: "2rem",
-              color: auditRatioColor,
-              textAlign: "center",
-            }}
-          >
-            {auditRatioValue.toFixed(2)}
-            <p
-              style={{
-                fontSize: "1.2rem",
-                color: auditRatioColor,
-                marginTop: "0.5rem",
-              }}
-            >
-              {auditRatioMessage}
+          <div className="audit-ratio-container">
+            <p className="audit-ratio">
+              <strong>Audit Ratio:</strong>{" "}
+              <span style={{ color: auditRatioColor }}>
+                {auditRatioValue.toFixed(2)}
+              </span>
             </p>
+            <p className="audit-message">{auditRatioMessage}</p>
           </div>
-          {/* Audit Graph */}
-          <ResponsiveContainer width={200} height={200}>
+
+          {/* Audit Bar Chart */}
+          <ResponsiveContainer width="100%" height={300}>
             <BarChart data={auditData}>
-              <XAxis dataKey="name" />
-              <Tooltip />
-              <Bar dataKey="value" fill="#8884d8" radius={[10, 10, 0, 0]} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#2e2e40" />
+              <XAxis dataKey="name" stroke="#c7c7c7" />
+              <YAxis stroke="#c7c7c7" />
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    const { name, value } = payload[0].payload;
+                    return (
+                      <div
+                        style={{
+                          backgroundColor: "#1a1a2e",
+                          padding: "10px",
+                          border: "1px solid #9b59b6",
+                          color: "#ffffff",
+                        }}
+                      >
+                        <p>
+                          <strong>{name}:</strong> {value}
+                        </p>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+                cursor={{ fill: "rgba(155, 89, 182, 0.2)" }}
+              />
+              <Bar dataKey="value" fill="#9b59b6" radius={[10, 10, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
-        {/* Technical Skills Radar Chart */}
-        <div className="profile-card">
-          <h2>Technical Skills</h2>
-          <ResponsiveContainer width="100%" height={400}>
-            <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
-              <PolarGrid />
-              <PolarAngleAxis dataKey="subject" />
-              <PolarRadiusAxis />
-              <Radar
-                name="Skills"
-                dataKey="value"
-                stroke="#8884d8"
-                fill="#8884d8"
-                fillOpacity={0.6}
-              />
-            </RadarChart>
-          </ResponsiveContainer>
-        </div>
+      </div>
+
+      {/* Radar Chart */}
+      <div className="radar-chart-container">
+        <h2 className="radar-chart-title">Technical Skills</h2>
+        <ResponsiveContainer width="100%" height={400}>
+          <RadarChart data={radarDataToUse}>
+            <PolarGrid />
+            <PolarAngleAxis dataKey="subject" stroke="#c7c7c7" />
+            <PolarRadiusAxis stroke="#c7c7c7" />
+            <Radar
+              name="Skills"
+              dataKey="value"
+              stroke="#ff6347"
+              fill="#ff6347"
+              fillOpacity={0.6}
+            />
+          </RadarChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
