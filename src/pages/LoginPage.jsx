@@ -1,4 +1,3 @@
-// src/pages/LoginPage.jsx
 import { useState } from "react";
 import axios from "axios";
 import "../styles/LoginPage.css";
@@ -43,11 +42,11 @@ function LoginPage() {
   return (
     <div className="login-container">
       <div className="login-card">
-        <h2>Welcome Back</h2>
-        <p>Please login to access your profile</p>
+        <h1 className="brand-title">Welcome to 01!</h1>
+        <p className="tagline">Step into the future of learning.</p>
         <form onSubmit={handleLogin}>
           <div className="input-group">
-            <label>Username or Email</label>
+            <label>Email or Username</label>
             <input
               type="text"
               value={usernameOrEmail}
@@ -65,7 +64,7 @@ function LoginPage() {
             />
           </div>
           <button type="submit" className="login-button">
-            Login
+            Log In
           </button>
           {error && <p className="error-message">{error}</p>}
         </form>
