@@ -1,8 +1,8 @@
-// src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
 import PrivateRoute from "./auth/PrivateRoute";
+import ErrorPage from "./pages/ErrorPage";
 
 function App() {
   return (
@@ -17,6 +17,8 @@ function App() {
             </PrivateRoute>
           }
         />
+        {/* Catch-all route for undefined paths */}
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
     </Router>
   );
