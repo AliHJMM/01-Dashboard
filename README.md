@@ -130,21 +130,6 @@ This project helps in mastering the following concepts:
 
 ---
 
-## Future Enhancements
-
-- Add more detailed user insights with additional GraphQL queries.
-- Implement dark mode for improved user experience.
-- Enhance graph interactivity with tooltips and animations.
-- Integrate a leaderboard feature to encourage healthy competition.
-
----
-
 ## Author
 
-- Developed by **[Ali Hasan]** for **Reboot01**.
-
----
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+- Developed by **Ali Hasan** for **Reboot01**.
