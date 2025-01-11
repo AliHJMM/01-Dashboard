@@ -38,8 +38,8 @@ const toKilobytes = (value) => {
 
 function ProfilePage() {
   function handleLogout() {
-    // Remove JWT token from localStorage
-    localStorage.removeItem("jwt");
+    // Remove  token from localStorage
+    localStorage.removeItem("token");
 
     // Optionally, redirect the user to the login page
     window.location.href = "/"; // Adjust the path based on your app's routing
