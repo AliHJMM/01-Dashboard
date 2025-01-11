@@ -1,4 +1,4 @@
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import "../styles/ProfilePage.css";
 import {
   ResponsiveContainer,
@@ -17,17 +17,15 @@ import {
   Bar,
 } from "recharts";
 
-// Queries
-const GET_USER_INFO = gql`
-  query {
-    user {
-      id
-      login
-      email
-      attrs
-    }
-  }
-`;
+import {
+  GET_USER_INFO,
+  GET_TRANSACTIONS,
+  GET_TOTAL_XP,
+  GET_AUDITS,
+  GET_AUDIT_STATS,
+  GET_TECHNICAL_SKILLS,
+  GET_TOP_TRANSACTION,
+} from "../queries/queries";
 
 // Utility Function to Convert XP to Kilobytes
 const toKilobytes = (value) => {
@@ -37,117 +35,6 @@ const toKilobytes = (value) => {
     return Math.floor(value / 1000) + " kB";
   }
 };
-
-const GET_TRANSACTIONS = gql`
-  query {
-    transaction(
-      where: {
-        type: { _eq: "xp" }
-        _or: [
-          { object: { type: { _eq: "project" } } }
-          {
-            object: { type: { _eq: "exercise" } }
-            event: { path: { _eq: "/bahrain/bh-module" } }
-          }
-        ]
-      }
-      order_by: { createdAt: asc }
-    ) {
-      amount
-      createdAt
-      object {
-        name
-        type
-      }
-    }
-  }
-`;
-
-const GET_TOTAL_XP = gql`
-  query {
-    transaction_aggregate(
-      where: {
-        event: { path: { _eq: "/bahrain/bh-module" } }
-        type: { _eq: "xp" }
-      }
-    ) {
-      aggregate {
-        sum {
-          amount
-        }
-      }
-    }
-  }
-`;
-
-const GET_AUDITS = gql`
-  query {
-    user {
-      validAudits: audits_aggregate(
-        where: { grade: { _gte: 1 } }
-        order_by: { createdAt: desc }
-      ) {
-        nodes {
-          group {
-            captainLogin
-            createdAt
-          }
-        }
-      }
-      failedAudits: audits_aggregate(
-        where: { grade: { _lt: 1 } }
-        order_by: { createdAt: desc }
-      ) {
-        nodes {
-          group {
-            captainLogin
-            createdAt
-          }
-        }
-      }
-    }
-  }
-`;
-
-const GET_AUDIT_STATS = gql`
-  query {
-    user {
-      auditRatio
-      totalUp
-      totalDown
-    }
-  }
-`;
-
-const GET_TECHNICAL_SKILLS = gql`
-  query {
-    transaction(
-      where: {
-        _and: [
-          { type: { _ilike: "%skill%" } }
-          { object: { type: { _eq: "project" } } }
-        ]
-      }
-      order_by: [{ type: asc }, { createdAt: desc }]
-      distinct_on: type
-    ) {
-      amount
-      type
-    }
-  }
-`;
-
-const GET_TOP_TRANSACTION = gql`
-  query {
-    transaction(
-      order_by: { amount: desc }
-      limit: 1
-      where: { type: { _eq: "level" }, path: { _like: "/bahrain/bh-module%" } }
-    ) {
-      amount
-    }
-  }
-`;
 
 function ProfilePage() {
   function handleLogout() {
