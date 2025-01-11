@@ -114,7 +114,7 @@ The application utilizes various GraphQL query techniques:
 
 The application is deployed on **Vercel** for easy access:
 
-- [Live Application](https://your-vercel-deployment-url)
+- [Live Application](https://alihjmm-graphql.vercel.app/)
 
 ---
 
