@@ -150,6 +150,14 @@ const GET_TOP_TRANSACTION = gql`
 `;
 
 function ProfilePage() {
+  function handleLogout() {
+    // Remove JWT token from localStorage
+    localStorage.removeItem("jwt");
+
+    // Optionally, redirect the user to the login page
+    window.location.href = "/"; // Adjust the path based on your app's routing
+  }
+
   const {
     loading: userLoading,
     error: userError,
@@ -291,10 +299,16 @@ function ProfilePage() {
     <div className="profile-container">
       {/* Header Section */}
       <div className="profile-header">
-        <h1 className="profile-name">{`${attrs.firstName || "User"} ${
-          attrs.lastName || ""
-        }`}</h1>
+        <div className="header-content">
+          <h1 className="profile-name">{`Welcome, ${
+            attrs.firstName || "User"
+          } ${attrs.lastName || ""}!`}</h1>
+          <button className="logout-button" onClick={handleLogout}>
+            <i className="fa fa-sign-out" aria-hidden="true"></i> Logout
+          </button>
+        </div>
       </div>
+
       {/* Information Section */}
       <div className="profile-information">
         <h2>Information</h2>

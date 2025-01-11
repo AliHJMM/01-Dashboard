@@ -289,3 +289,62 @@ body {
     font-size: 1.5rem;
     /* Make the icon slightly larger */
 }
+
+/* Header Content Styling */
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #6a4c93;
+    /* Richer purple for contrast */
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Welcome Text Styling */
+.profile-name {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ffffff;
+    margin: 0;
+}
+
+/* Logout Button Styling */
+.logout-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e94b3c;
+    /* Vibrant red for emphasis */
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Icon inside Logout Button */
+.logout-button i {
+    margin-right: 0.5rem;
+    /* Add spacing between icon and text */
+}
+
+/* Logout Button Hover and Active Effects */
+.logout-button:hover {
+    background-color: #d43a2e;
+    /* Slightly darker red for hover effect */
+    transform: translateY(-2px);
+    /* Subtle hover lift effect */
+}
+
+.logout-button:active {
+    background-color: #c33127;
+    /* Even darker red for click effect */
+    transform: translateY(0);
+    /* Reset on click */
+}
