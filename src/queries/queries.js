@@ -1,7 +1,7 @@
 // src/queries/queries.js
 import { gql } from "@apollo/client";
 
-export const GET_USER_INFO = gql`
+export const FETCH_USER_INFO = gql`
   query {
     user {
       id
@@ -12,7 +12,7 @@ export const GET_USER_INFO = gql`
   }
 `;
 
-export const GET_TRANSACTIONS = gql`
+export const FETCH_TRANSACTIONS = gql`
   query {
     transaction(
       where: {
@@ -37,7 +37,7 @@ export const GET_TRANSACTIONS = gql`
   }
 `;
 
-export const GET_TOTAL_XP = gql`
+export const FETCH_TOTAL_XP = gql`
   query {
     transaction_aggregate(
       where: {
@@ -54,7 +54,7 @@ export const GET_TOTAL_XP = gql`
   }
 `;
 
-export const GET_AUDITS = gql`
+export const FETCH_USER_AUDITS = gql`
   query {
     user {
       validAudits: audits_aggregate(
@@ -83,7 +83,7 @@ export const GET_AUDITS = gql`
   }
 `;
 
-export const GET_AUDIT_STATS = gql`
+export const FETCH_AUDIT_STATS = gql`
   query {
     user {
       auditRatio
@@ -93,7 +93,7 @@ export const GET_AUDIT_STATS = gql`
   }
 `;
 
-export const GET_TECHNICAL_SKILLS = gql`
+export const FETCH_TECHNICAL_SKILLS = gql`
   query {
     transaction(
       where: {
@@ -111,7 +111,7 @@ export const GET_TECHNICAL_SKILLS = gql`
   }
 `;
 
-export const GET_TOP_TRANSACTION = gql`
+export const FETCH_USER_LEVEL = gql`
   query {
     transaction(
       order_by: { amount: desc }

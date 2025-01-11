@@ -18,13 +18,13 @@ import {
 } from "recharts";
 
 import {
-  GET_USER_INFO,
-  GET_TRANSACTIONS,
-  GET_TOTAL_XP,
-  GET_AUDITS,
-  GET_AUDIT_STATS,
-  GET_TECHNICAL_SKILLS,
-  GET_TOP_TRANSACTION,
+  FETCH_USER_INFO,
+  FETCH_TRANSACTIONS,
+  FETCH_TOTAL_XP,
+  FETCH_USER_AUDITS,
+  FETCH_AUDIT_STATS,
+  FETCH_TECHNICAL_SKILLS,
+  FETCH_USER_LEVEL,
 } from "../queries/queries";
 
 // Utility Function to Convert XP to Kilobytes
@@ -49,38 +49,37 @@ function ProfilePage() {
     loading: userLoading,
     error: userError,
     data: userData,
-  } = useQuery(GET_USER_INFO);
+  } = useQuery(FETCH_USER_INFO);
   const {
     loading: transactionsLoading,
     error: transactionsError,
     data: transactionsData,
-  } = useQuery(GET_TRANSACTIONS);
+  } = useQuery(FETCH_TRANSACTIONS);
   const {
     loading: totalXpLoading,
     error: totalXpError,
     data: totalXpData,
-  } = useQuery(GET_TOTAL_XP);
+  } = useQuery(FETCH_TOTAL_XP);
   const {
     loading: auditsLoading,
     error: auditsError,
     data: auditsData,
-  } = useQuery(GET_AUDITS);
+  } = useQuery(FETCH_USER_AUDITS);
   const {
     loading: statsLoading,
     error: statsError,
     data: statsData,
-  } = useQuery(GET_AUDIT_STATS);
+  } = useQuery(FETCH_AUDIT_STATS);
   const {
     loading: skillsLoading,
     error: skillsError,
     data: skillsData,
-  } = useQuery(GET_TECHNICAL_SKILLS);
-
+  } = useQuery(FETCH_TECHNICAL_SKILLS);
   const {
     loading: levelLoading,
     error: levelError,
     data: levelData,
-  } = useQuery(GET_TOP_TRANSACTION);
+  } = useQuery(FETCH_USER_LEVEL);
 
   if (
     userLoading ||
