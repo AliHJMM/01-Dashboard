@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is designed to explore the power of GraphQL by creating a dynamic user profile page that interacts with a GraphQL API. The application features user authentication, data visualization, and a clean, user-friendly interface to display insights into a user's journey and achievements. The project emphasizes mastery of GraphQL queries, authentication, and interactive data visualizations.
+This project demonstrates the power of GraphQL by creating a dynamic user profile page that interacts with a GraphQL API. The application features user authentication, data visualization, and a user-friendly interface to display insights into a user's journey and achievements. The project emphasizes mastery of GraphQL queries, authentication, and interactive data visualizations.
 
 ---
 
@@ -26,7 +26,7 @@ This project is designed to explore the power of GraphQL by creating a dynamic u
   - Nested queries.
   - Parameterized queries.
 
-### **Interactive Graphical Visualizations**
+### **Interactive Data Visualizations**
 
 - **XP Progression Graph**: Displays XP growth over time using line charts.
 - **Audit Overview**: Visualizes pass/fail ratios with bar charts.
