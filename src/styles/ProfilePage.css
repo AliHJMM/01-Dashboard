@@ -275,11 +275,10 @@ body {
 .audit-status-header {
     display: flex;
     justify-content: space-between;
-    /* Align title and icon */
+    /* Align text and icon */
     align-items: center;
-    /* Center them vertically */
+    /* Vertically center the content */
     margin-bottom: 0.5rem;
-    /* Add space below the header */
 }
 
 .audit-title {
@@ -287,10 +286,10 @@ body {
     font-weight: bold;
 }
 
+/* Success Icon Styling */
 .audit-icon.success {
     color: #29d5a4;
     font-size: 1.5rem;
-    /* Make the icon slightly larger */
 }
 
 /* Header Content Styling */
@@ -350,4 +349,9 @@ body {
     /* Even darker red for click effect */
     transform: translateY(0);
     /* Reset on click */
+}
+
+.audit-icon.fail {
+    color: #ff6347;
+    font-size: 1.5rem;
 }

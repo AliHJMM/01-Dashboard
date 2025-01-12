@@ -245,20 +245,21 @@ function ProfilePage() {
           ))}
           {failedAudits.map((audit, index) => (
             <div key={`failed-${index}`} className="audit-status-item">
-              <span className="audit-icon fail">❌</span>
-              <div className="audit-info">
-                <p className="audit-title">
+              <div className="audit-status-header">
+                <span className="audit-title">
                   <strong>Captain:</strong> {audit.group.captainLogin}
-                </p>
-                <p className="audit-date">
-                  <strong>Date:</strong>{" "}
-                  {new Date(audit.group.createdAt).toLocaleDateString()}
-                </p>
+                </span>
+                <span className="audit-icon fail">❌</span>
               </div>
+              <p className="audit-date">
+                <strong>Date:</strong>{" "}
+                {new Date(audit.group.createdAt).toLocaleDateString()}
+              </p>
             </div>
           ))}
         </div>
       </div>
+
       {/* Transactions Section */}
       <div className="transactions-container">
         <h2 className="transactions-title">Projects</h2>
