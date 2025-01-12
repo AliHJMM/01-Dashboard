@@ -342,7 +342,9 @@ function ProfilePage() {
               {auditRatioValue.toFixed(2)}
             </span>
           </div>
-          <p className="audit-message">{auditRatioMessage}</p>
+          <p className="audit-message" style={{ color: auditRatioColor }}>
+            {auditRatioMessage}
+          </p>
         </div>
 
         <ResponsiveContainer width="100%" height={300}>

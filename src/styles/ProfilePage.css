@@ -259,16 +259,12 @@ body {
 
 .audit-ratio-value {
     font-size: 1.5rem;
-    /* Highlight the ratio value */
     font-weight: bold;
 }
 
 .audit-message {
     font-size: 1rem;
-    color: #ff6347;
-    /* Highlight the message in red */
     margin-top: 0.5rem;
-    /* Add spacing above the message */
     text-align: center;
 }
 
