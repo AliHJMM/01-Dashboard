@@ -1,4 +1,4 @@
-# GraphQL Profile Page
+# 01 Dashboard
 
 ## Overview
 
