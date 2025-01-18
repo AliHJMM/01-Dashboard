@@ -89,7 +89,7 @@ The application utilizes various GraphQL query techniques:
 1. **Clone the Repository:**
 
    ```bash
-   git clone https://github.com/AliHJMM/GraphQL
+   git clone https://github.com/AliHJMM/01-Dashboard
    cd your-repository-folder
    ```
 
@@ -114,7 +114,7 @@ The application utilizes various GraphQL query techniques:
 
 The application is deployed on **Vercel** for easy access:
 
-- [Live Application](https://alihjmm-graphql.vercel.app/)
+- [Live Application](https://01-dashboard.vercel.app/)
 
 ---
 
