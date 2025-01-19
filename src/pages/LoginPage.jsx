@@ -14,7 +14,7 @@ function LoginPage() {
     try {
       const credentials = btoa(`${usernameOrEmail}:${password}`);
       const response = await axios.post(
-        import.meta.env.VITE_AUTH_API,
+        "https://learn.reboot01.com/api/auth/signin",
         {},
         {
           headers: {
