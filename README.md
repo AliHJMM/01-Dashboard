@@ -132,4 +132,4 @@ This project helps in mastering the following concepts:
 
 ## Author
 
-- Developed by **Ali Hasan** for **Reboot01**.
+- Developed by **Ali Hasan Jasim** for **Reboot01**.
