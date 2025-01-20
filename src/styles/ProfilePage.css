@@ -351,3 +351,119 @@ body {
     color: #ff6347;
     font-size: 1.5rem;
 }
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+
+    /* Profile Container: Single-column layout */
+    .profile-container {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+        gap: 15px;
+    }
+
+    /* Profile Header: Adjust padding */
+    .profile-header {
+        grid-column: span 1;
+        padding: 1rem;
+    }
+
+    .profile-name {
+        font-size: 1.8rem;
+    }
+
+    /* Information Section: Single-column grid */
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .info-card {
+        padding: 1rem;
+    }
+
+    /* Card Section: Reduce padding for all cards */
+    .profile-card,
+    .xp-chart-container,
+    .audit-overview-container,
+    .radar-chart-container,
+    .transactions-container,
+    .audit-status-container {
+        padding: 1rem;
+    }
+
+    /* Charts Section: Ensure full width */
+    .xp-chart-container,
+    .audit-overview-container,
+    .radar-chart-container {
+        grid-column: span 1;
+    }
+
+    /* Transactions Section: Adjust height */
+    .transactions-list,
+    .audit-status-list {
+        max-height: 300px;
+    }
+
+    /* Adjust font size in audit ratio */
+    .audit-ratio-header {
+        font-size: 1rem;
+    }
+
+    .audit-ratio-value {
+        font-size: 1.2rem;
+    }
+
+    .audit-message {
+        font-size: 0.9rem;
+    }
+
+    /* Adjust logout button size */
+    .logout-button {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    /* Reduce icon size */
+    .logout-button i {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+
+    /* Profile Header: Smaller font size for very small screens */
+    .profile-name {
+        font-size: 1.5rem;
+    }
+
+    /* Charts Section: Ensure proper padding for small screens */
+    .xp-chart-container,
+    .audit-overview-container,
+    .radar-chart-container {
+        margin-bottom: 1rem;
+    }
+
+    /* Adjust audit title font size */
+    .audit-title {
+        font-size: 1rem;
+    }
+
+    /* Reduce padding for cards */
+    .profile-card,
+    .xp-chart-container,
+    .audit-overview-container,
+    .radar-chart-container,
+    .transactions-container,
+    .audit-status-container {
+        padding: 0.8rem;
+    }
+
+    /* Transactions: Adjust font size */
+    .transaction-details h3 {
+        font-size: 1rem;
+    }
+
+    .transaction-xp {
+        font-size: 0.9rem;
+    }
+}
