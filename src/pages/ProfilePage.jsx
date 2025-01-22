@@ -14,11 +14,15 @@ import XPProgress from "../components/XPProgress";
 import AuditOverview from "../components/AuditOverview";
 import TechnicalSkills from "../components/TechnicalSkills";
 
+// Main ProfilePage component
 function ProfilePage() {
+  // Handles logout functionality
   const handleLogout = () => {
+    // Clear the token from localStorage and redirect to login page
     localStorage.removeItem("token");
     window.location.href = "/";
   };
+  // Use custom hook to fetch profile-related queries
   const {
     userQuery,
     transactionsQuery,
@@ -31,17 +35,21 @@ function ProfilePage() {
     errorStates,
   } = useProfileQueries();
 
+  // Display loading state if any query is still loading
   if (loadingStates.some(Boolean)) return <p className="loading">Loading...</p>;
+  // Display error message if any query fails
   if (errorStates.some(Boolean)) {
     const errorMessage =
       errorStates.find((error) => error)?.message || "Unknown error";
     return <p className="error-message">Error: {errorMessage}</p>;
   }
 
+  // Extract user details
   const user = userQuery.data?.user?.[0];
   const attrs = user?.attrs || {};
   const level = levelQuery.data?.transaction?.[0]?.amount || "N/A";
 
+  // Extract and process transaction data
   const transactions = transactionsQuery.data?.transaction || [];
   const totalXp =
     totalXpQuery.data?.transaction_aggregate?.aggregate?.sum?.amount || 0;
@@ -56,6 +64,7 @@ function ProfilePage() {
         { date: "2023-02-01", xp: 200 },
       ];
 
+  // Extract and process audit data
   const validAudits = auditsQuery.data?.user?.[0]?.validAudits?.nodes || [];
   const failedAudits = auditsQuery.data?.user?.[0]?.failedAudits?.nodes || [];
   const auditRatio = statsQuery.data?.user?.[0]?.auditRatio || 0;
@@ -66,6 +75,7 @@ function ProfilePage() {
     { name: "Received", value: totalDown },
   ];
 
+  // Extract and process radar chart data
   const radarData = skillsQuery.data?.transaction.map((s) => ({
     subject: s.type,
     value: s.amount,
@@ -78,6 +88,7 @@ function ProfilePage() {
         { subject: "React", value: 90, fullMark: 100 },
       ]);
 
+  // Get dynamic color and message for audit ratio display
   const { color: auditRatioColor, message: auditRatioMessage } =
     getAuditRatioDisplay(auditRatio);
 

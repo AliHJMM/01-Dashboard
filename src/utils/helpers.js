@@ -1,5 +1,3 @@
-// src/utils/helpers.js
-
 export const toKilobytes = (value) =>
   value < 1000 ? `${value} B` : `${Math.floor(value / 1000)} kB`;
 

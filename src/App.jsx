@@ -17,7 +17,6 @@ function App() {
             </PrivateRoute>
           }
         />
-        {/* Catch-all route for undefined paths */}
         <Route path="*" element={<ErrorPage />} />
       </Routes>
     </Router>

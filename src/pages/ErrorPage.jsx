@@ -1,6 +1,6 @@
-// src/pages/ErrorPage.jsx
 import "../styles/ErrorPage.css";
 
+// ErrorPage component to display a 404 error message for undefined routes
 function ErrorPage() {
   return (
     <div className="error-container">

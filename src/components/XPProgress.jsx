@@ -10,11 +10,14 @@ import {
 } from "recharts";
 import "../styles/XPProgress.css";
 
+// XPProgress component to display user XP progress and level
 const XPProgress = ({ xpDataToUse, level, totalXp, toKilobytes }) => (
   <div className="xp-chart-container">
     <h2 className="xp-chart-title">XP Progress</h2>
     <div className="xp-header-container">
+      {/* Display user's current level */}
       <span className="user-level">Level {level}</span>
+      {/* Display user's total XP formatted in kilobytes */}
       <span className="user-xp">{toKilobytes(totalXp)}</span>
     </div>
     <ResponsiveContainer width="100%" height={300}>
@@ -27,6 +30,7 @@ const XPProgress = ({ xpDataToUse, level, totalXp, toKilobytes }) => (
             value < 1000 ? value + " B" : Math.floor(value / 1000) + " kB"
           }
         />
+        {/* Tooltip to show detailed XP info on hover */}
         <Tooltip
           contentStyle={{
             backgroundColor: "#2e2e40",
@@ -43,20 +47,17 @@ const XPProgress = ({ xpDataToUse, level, totalXp, toKilobytes }) => (
   </div>
 );
 
-// Prop Validation
+// Validate props to ensure correct data structure and types
 XPProgress.propTypes = {
   xpDataToUse: PropTypes.arrayOf(
     PropTypes.shape({
-      date: PropTypes.string.isRequired, // Date of the XP entry (formatted string)
-      xp: PropTypes.number.isRequired, // XP amount
+      date: PropTypes.string.isRequired,
+      xp: PropTypes.number.isRequired,
     })
   ).isRequired,
-  level: PropTypes.oneOfType([
-    PropTypes.number, // Numeric level value
-    PropTypes.string, // Fallback 'N/A' or similar
-  ]).isRequired,
-  totalXp: PropTypes.number.isRequired, // Total XP as a number
-  toKilobytes: PropTypes.func.isRequired, // Function to convert XP to readable format
+  level: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  totalXp: PropTypes.number.isRequired,
+  toKilobytes: PropTypes.func.isRequired,
 };
 
 export default XPProgress;

@@ -9,6 +9,7 @@ import {
   FETCH_USER_LEVEL,
 } from "../queries/queries";
 
+// Custom hook to fetch profile-related data using GraphQL queries
 export const useProfileData = () => {
   const userQuery = useQuery(FETCH_USER_INFO);
   const transactionsQuery = useQuery(FETCH_TRANSACTIONS);
@@ -18,6 +19,7 @@ export const useProfileData = () => {
   const skillsQuery = useQuery(FETCH_TECHNICAL_SKILLS);
   const levelQuery = useQuery(FETCH_USER_LEVEL);
 
+  // Return all queries so they can be accessed by the consuming component
   return {
     userQuery,
     transactionsQuery,

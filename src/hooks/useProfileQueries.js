@@ -1,5 +1,6 @@
 import { useProfileData } from "./useProfileData";
 
+// Custom hook to aggregate profile-related query data and states
 export const useProfileQueries = () => {
   const {
     userQuery,
@@ -11,6 +12,7 @@ export const useProfileQueries = () => {
     levelQuery,
   } = useProfileData();
 
+  // Combine loading states of all queries into a single array
   const loadingStates = [
     userQuery.loading,
     transactionsQuery.loading,
@@ -21,6 +23,7 @@ export const useProfileQueries = () => {
     levelQuery.loading,
   ];
 
+  // Combine error states of all queries into a single array
   const errorStates = [
     userQuery.error,
     transactionsQuery.error,
@@ -31,6 +34,7 @@ export const useProfileQueries = () => {
     levelQuery.error,
   ];
 
+  // Return all queries along with their aggregated states
   return {
     userQuery,
     transactionsQuery,

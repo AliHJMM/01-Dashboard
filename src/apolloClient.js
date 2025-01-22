@@ -4,7 +4,7 @@ const token = localStorage.getItem("token"); // Get the token from localStorage
 
 const client = new ApolloClient({
   link: new HttpLink({
-    uri: "https://learn.reboot01.com/api/graphql-engine/v1/graphql", // Use environment variable
+    uri: "https://learn.reboot01.com/api/graphql-engine/v1/graphql",
     headers: {
       Authorization: token ? `Bearer ${token}` : "", // Ensure Bearer token format
     },
