@@ -31,9 +31,16 @@ function LoginPage() {
       localStorage.setItem("token", token);
       window.location.href = "/profile";
     } catch (err) {
-      let message = "An unexpected error occurred. Please try again.";
+      let message = "Something went wrong. Please try again in a moment.";
       if (err.response?.status === 401) {
-        message = "Invalid credentials. Please try again.";
+        message =
+          "Your username or password is incorrect. Please check your credentials and try again.";
+      } else if (err.response?.status === 500) {
+        message =
+          "We’re experiencing technical difficulties. Please try again later.";
+      } else if (!err.response) {
+        message =
+          "Network error. Please check your internet connection and try again.";
       }
       setError(message);
     }
