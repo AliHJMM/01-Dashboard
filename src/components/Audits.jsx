@@ -4,7 +4,7 @@ import "../styles/Audits.css";
 // Component to display valid and failed audits
 const Audits = ({ validAudits, failedAudits }) => (
   <div className="audit-status-container">
-    <h2>Audits</h2>
+    <h2>Completed Audits</h2>
     <div className="audit-status-list">
       {/* Render valid audits */}
       {validAudits.map((audit, index) => (

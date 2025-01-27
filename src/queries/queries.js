@@ -14,16 +14,7 @@ export const FETCH_USER_INFO = gql`
 export const FETCH_TRANSACTIONS = gql`
   query {
     transaction(
-      where: {
-        type: { _eq: "xp" }
-        _or: [
-          { object: { type: { _eq: "project" } } }
-          {
-            object: { type: { _eq: "exercise" } }
-            event: { path: { _eq: "/bahrain/bh-module" } }
-          }
-        ]
-      }
+      where: { type: { _eq: "xp" }, object: { type: { _eq: "project" } } }
       order_by: { createdAt: asc }
     ) {
       amount
